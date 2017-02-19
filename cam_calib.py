@@ -3,9 +3,10 @@ import cv2
 import glob
 import os
 
+
 def ensure_dir(d):
     if not os.path.exists(d):
-        os.mkdirs(d)
+        os.makedirs(d)
 
 def find_corners(img,pattern):
     # adapted from http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_calib3d/py_calibration/py_calibration.html
@@ -18,17 +19,8 @@ def find_corners(img,pattern):
 
     # Find the chess board corners
     ret, corners = cv2.findChessboardCorners(gray, pattern, None)
-
-    # If found, add object points, image points (after refining them)
-
-    if ret == True:
-
+    if ret is True:
         cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
-        imgpoints.append(corners)
-
-        # Draw and display the corners
-        cv2.drawChessboardCorners(img, pattern, corners,ret)
-
     # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
     objp = np.zeros((pattern[0]*pattern[1],3), np.float32)
     objp[:,:2] = np.mgrid[0:pattern[0],0:pattern[1]].T.reshape(-1,2)
@@ -36,27 +28,40 @@ def find_corners(img,pattern):
     return ret, corners, objp, pattern
 
 
-if __name__ == '__main__':
+def cam_calib(recal = True):
+    out_path = 'output_images/calib'
+    ensure_dir(out_path)
+    calib_file = os.path.join(out_path,'calib.npz')
 
-    patterns = [(9,6), (9,5), (7,6), (6,6)] # [1,17,1,1]
+    if recal is False:
+    # read existing calib data
+    #if os.path.isfile(calib_file):
+        calib = np.load(calib_file)
+        objpoints = calib['objpoints']
+        imgpoints = calib['imgpoints']
+        return objpoints, imgpoints
+
+    # re-calib
+    patterns = [(9,6), (9,5), (7,6), (4,6)] # [X1(1.jpg),X17,X1(5.jpg),X1(4.jpg)] 6X6 if change direction for 4.jpg
 
     # Arrays to store object points and image points from all the images.
     objpoints = [] # 3d point in real world space
     imgpoints = [] # 2d points in image plane.
 
     images = glob.glob('camera_cal/*.jpg')
-    out_path = 'output_images/calib'
-    ensure_dir(out_path)
 
     for fname in images:
-    #fname = 'camera_cal/calibration4.jpg'
+        # fname = 'camera_cal/calibration4.jpg'
         img = cv2.imread(fname)
+        print(fname)
+        print(img.shape)
 
         for pattern in patterns:
             ret, corners, objp, found_pattern = find_corners(img, pattern)
             if ret == True:
                 break
 
+        # If found, add object points, image points (after refining them)
         if ret == True:
             objpoints.append(objp)
             imgpoints.append(corners)
@@ -66,12 +71,18 @@ if __name__ == '__main__':
             cv2.imwrite(os.path.join(out_path,fname[11:]),img)
 
         else:
-            print fname
-            print ret
+            print(fname)
+            print(ret)
+    imgsize = img.shape[:2]
+    print(imgsize)
+    np.savez(calib_file,objpoints,imgpoints,imgsize)
 
-    for objpoint in objpoints:
-        print objpoint.shape
+    return objpoints, imgpoints
 
-    for imgpoint in imgpoints:
-        print imgpoint.shape
-    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+
+    objpoints, imgpoints = cam_calib()
+
+    #cv2.calibrateCamera(objpoints,imgpoints)
+
