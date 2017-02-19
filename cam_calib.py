@@ -37,9 +37,11 @@ def cam_calib(recal = True):
     # read existing calib data
     #if os.path.isfile(calib_file):
         calib = np.load(calib_file)
+        print(calib.files)
         objpoints = calib['objpoints']
         imgpoints = calib['imgpoints']
-        return objpoints, imgpoints
+        imgsize = calib['imgsize']
+        return objpoints, imgpoints, imgsize
 
     # re-calib
     patterns = [(9,6), (9,5), (7,6), (4,6)] # [X1(1.jpg),X17,X1(5.jpg),X1(4.jpg)] 6X6 if change direction for 4.jpg
@@ -73,16 +75,28 @@ def cam_calib(recal = True):
         else:
             print(fname)
             print(ret)
-    imgsize = img.shape[:2]
+    imgsize = img.shape
     print(imgsize)
-    np.savez(calib_file,objpoints,imgpoints,imgsize)
+    np.savez(calib_file,objpoints=objpoints,imgpoints=imgpoints,imgsize=imgsize)
 
-    return objpoints, imgpoints
+    return objpoints, imgpoints, imgsize
+
 
 
 if __name__ == '__main__':
 
-    objpoints, imgpoints = cam_calib()
+    objpoints, imgpoints, imgsize = cam_calib(False)
 
-    #cv2.calibrateCamera(objpoints,imgpoints)
+    cret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints,imgpoints,(imgsize[1],imgsize[0]),None,None)
+    print(dist)
 
+    images = glob.glob('camera_cal/*.jpg')
+    fname = 'camera_cal/calibration4.jpg'
+    img = cv2.imread(fname)
+    print(fname)
+    print(img.shape)
+
+    # undistort
+    dst = cv2.undistort(img, mtx, dist)
+    cv2.imshow("undistor",dst)
+    cv2.waitKey(1000)
