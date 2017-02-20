@@ -2,15 +2,11 @@ import numpy as np
 import cv2
 import glob
 import os
+from myutil import ensure_dir
 
-
-def ensure_dir(d):
-    if not os.path.exists(d):
-        os.makedirs(d)
 
 def find_corners(img,pattern):
     # adapted from http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_calib3d/py_calibration/py_calibration.html
-
 
     # termination criteria
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -28,22 +24,10 @@ def find_corners(img,pattern):
     return ret, corners, objp, pattern
 
 
-def cam_calib(recal = True):
-    out_path = 'output_images/calib'
+def find_pts(out_path='output_images/calib'):
     ensure_dir(out_path)
-    calib_file = os.path.join(out_path,'calib.npz')
 
-    if recal is False:
-    # read existing calib data
-    #if os.path.isfile(calib_file):
-        calib = np.load(calib_file)
-        print(calib.files)
-        objpoints = calib['objpoints']
-        imgpoints = calib['imgpoints']
-        imgsize = calib['imgsize']
-        return objpoints, imgpoints, imgsize
-
-    # re-calib
+    # calib patterns
     patterns = [(9,6), (9,5), (7,6), (4,6)] # [X1(1.jpg),X17,X1(5.jpg),X1(4.jpg)] 6X6 if change direction for 4.jpg
 
     # Arrays to store object points and image points from all the images.
@@ -64,7 +48,7 @@ def cam_calib(recal = True):
                 break
 
         # If found, add object points, image points (after refining them)
-        if ret == True:
+        if ret is True:
             objpoints.append(objp)
             imgpoints.append(corners)
 
@@ -73,30 +57,40 @@ def cam_calib(recal = True):
             cv2.imwrite(os.path.join(out_path,fname[11:]),img)
 
         else:
+            print("corner points detection failure")
             print(fname)
             print(ret)
     imgsize = img.shape
     print(imgsize)
-    np.savez(calib_file,objpoints=objpoints,imgpoints=imgpoints,imgsize=imgsize)
 
     return objpoints, imgpoints, imgsize
 
+def cam_calib(objpoints,imgpoints,imgsize):
 
+    # calibration
+    cret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints,imgpoints,(imgsize[1],imgsize[0]),None,None)
+
+    return mtx,dist
 
 if __name__ == '__main__':
 
-    objpoints, imgpoints, imgsize = cam_calib(False)
+    path = 'output_images'
+    ensure_dir(path)
 
-    cret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints,imgpoints,(imgsize[1],imgsize[0]),None,None)
-    print(dist)
+    # find corners
+    objpoints, imgpoints, imgsize = find_pts()
+    np.savez(os.path.join(path, 'calib_pts.npz'),objpoints=objpoints,imgpoints=imgpoints,imgsize=imgsize)
 
-    images = glob.glob('camera_cal/*.jpg')
-    fname = 'camera_cal/calibration4.jpg'
-    img = cv2.imread(fname)
-    print(fname)
-    print(img.shape)
+    # calibration
+    mtx,dist = cam_calib(objpoints,imgpoints,imgsize)
+    np.savez(os.path.join(path, 'calib_mtx.npz'), mtx=mtx, dist=dist)
 
     # undistort
-    dst = cv2.undistort(img, mtx, dist)
-    cv2.imshow("undistor",dst)
-    cv2.waitKey(1000)
+    out_path = 'output_images/undistort'
+    ensure_dir(out_path)
+
+    images = glob.glob('camera_cal/*.jpg')
+    for fname in images:
+        img = cv2.imread(fname)
+        undistort_img = cv2.undistort(img, mtx, dist)
+        cv2.imwrite(os.path.join(out_path, 'undistort'+fname[22:]), undistort_img)
