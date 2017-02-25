@@ -17,6 +17,7 @@
 [img_undistort]: ./output_images/undistort/undistort1.jpg "Undistort image"
 [img_test]: ./test_images/test1.jpg "Road Transformed"
 [img_undistort_lane]: ./output_images/undistort_lane/test1.jpg "Road Transformed"
+[img_binary]: ./output_images/binary/figure_1.png "Binary"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
@@ -71,7 +72,12 @@ After the camera calibration, I get camera matrix `mtx`, and distortion coeefici
 
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `image_trans.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color and gradient thresholds to generate a binary image. The following example shows: original image, binary image by gradient, binary image by color.
+![alt text][img_binary]
+
+
+ (thresholding steps at lines # through # in `image_trans.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+
 
 ![alt text][image3]
 
