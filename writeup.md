@@ -15,9 +15,12 @@
 
 [img_corners]: ./output_images/calib/calibration1.jpg "Corner points"
 [img_undistort]: ./output_images/undistort/undistort1.jpg "Undistort image"
-[img_test]: ./test_images/test1.jpg "Road Transformed"
-[img_undistort_lane]: ./output_images/undistort_lane/test1.jpg "Road Transformed"
-[img_binary]: ./output_images/binary/figure_1.png "Binary"
+[img_test]: ./test_images/straight_lines2.jpg "Road Transformed"
+[img_undistort_lane]: ./output_images/undistort_straight_lines2.jpg "Undistort"
+[img_binary1]: ./output_images/binary_straight_lines2.jpg "Binary1"
+[img_binary2]: ./output_images/binary_test1.jpg "Binary2"
+[img_binary3]: ./output_images/binary_combine.jpg "Binary3"
+[img_2_3]: ./output_images/test_perspective.jpg "Warp Example"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
@@ -72,44 +75,49 @@ After the camera calibration, I get camera matrix `mtx`, and distortion coeefici
 
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image. The following example shows: original image, binary image by gradient, binary image by color.
-![alt text][img_binary]
+The code of this part in the file `image_trans.py`, including image distortion from calibration matrix, image transformation to gray color or to different color space and generating binary images.
 
+To use the gradient threshold, I first convert the image into gray scale and apply `cv2.Sobel()` on the x-direction since x-direction is better than y-direction to pick the lanes. Then threshold `[20,100]` is used to produce a binary image thresholded by gradient (see the middle figure of the above picture.
 
- (thresholding steps at lines # through # in `image_trans.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I also use color to threshold an image. First I convert the image from RGB color space to HLS color space by `cv2.cvtColor`. And S-channel image is chosen to do a thresholding. The parameter is set to `[90,255]`. Notice that in the lecture, an exlusive - inclusive thresholding is used, i.e. `(90, 255]]` while here I use a double inclusive thresholding. 
 
+![alt text][img_binary1]
 
-![alt text][image3]
+By trying different test images, I found that s-channel image is relatively robust while gradient is not so robust under different conditions. For example, see the following picture.
+
+![alt text][img_binary2]
+
+I think a combination of color and region of interest will be able to better select the lanes, so I added the ROI selection code of previous lectures above the color selection, then I get results like this:
+
+![alt text][img_binary3]
 
 ####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `warper()`, which appears in lines 23 through 28 in the file `./trans_perspective.py`. The `warper()` function takes as inputs an image (`img`), and compute source (`src_pts`) as well as and destination (`dst_pts`) points.  I chose the hardcode the source and destination points in the following manner:
 
 ```
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
+    src_pts = np.array([[(imsize[0]/6+10, imsize[1]),
+                         (imsize[0] / 2 - 60, imsize[1] / 2 + 100),
+                         (imsize[0] / 2 + 65, imsize[1] / 2 + 100),
+                         (imsize[0]*5/6 + 40, imsize[1])]],dtype=np.float32)
+
+    dst_pts = np.array([[(imsize[0]/4,imsize[1]),(imsize[0]/4, 0),
+                         (imsize[0]*3/4,0),(imsize[0]*3/4,imsize[1])]],dtype=np.float32)
 
 ```
 This resulted in the following source and destination points:
 
-| Source        | Destination   | 
-|:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+| Source              | Destination   | 
+|:-------------------:|:-------------:| 
+|223.33332825   720.  |320.  720.     | 
+|580.           460.  |320.    0.     |
+|705.           460.  |960.    0.     |
+|1106.66662598  720.  | 960.  720.    |
 
-![alt text][image4]
+I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image (shown as follows).
+
+![alt text][img_2_3]
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 

@@ -76,40 +76,96 @@ def hls_thresh(img, channel='s', thresh=(0,255)):
 
     return s_binary, s_img
 
-if __name__ == '__main__':
+def roi(img):
+    """
+    Defines an image mask.
 
-    image_file = 'test_images/straight_lines2.jpg'
-    ori_img = mpimg.imread(image_file)
+    Only keeps the region of the image defined by the polygon
+    formed from `vertices`. The rest of the image is set to black.
+    """
+
+    imshape = img.shape
+    # vertices = np.array([[(imshape[1] * 0.12, imshape[0]), (imshape[1] * 0.45, imshape[0] * 0.6),
+    #                       (imshape[1] * 0.55, imshape[0] * 0.6), (imshape[1] * 0.95, imshape[0])]], dtype=np.int32)
+
+    vertices = np.array([[(imshape[1] * 0.15+10, imshape[0]), (imshape[1] * 0.46+20, imshape[0] * 0.6),
+                          (imshape[1] * 0.54-20, imshape[0] * 0.6), (imshape[1] * 0.85+40, imshape[0])]], dtype=np.int32)
+    # draw roi
+    num_pt = len(vertices[0, :])
+    roi_plt = np.copy(img)
+    for i in np.arange(num_pt):
+        pt1 = vertices[0, i]
+        pt2 = vertices[0, i - 3]
+        cv2.line(roi_plt, (pt1[0], pt1[1]), (pt2[0], pt2[1]), [0, 0, 255], 5)
+
+    # defining a blank mask to start with
+    mask = np.zeros_like(img)
+
+    # defining a 3 channel or 1 channel color to fill the mask with depending on the input image
+    if len(img.shape) > 2:
+        channel_count = img.shape[2]  # i.e. 3 or 4 depending on your image
+        ignore_mask_color = (255,) * channel_count
+    else:
+        ignore_mask_color = 255
+
+    # filling pixels inside the polygon defined by "vertices" with the fill color
+    cv2.fillPoly(mask, vertices, ignore_mask_color)
+
+    # returning the image only where mask pixels are nonzero
+    masked_image = cv2.bitwise_and(img, mask)
+    return mask,masked_image,roi_plt
+
+
+def warper(img):
+    pass
+
+if __name__ == '__main__':
+    ori_img = mpimg.imread('test_images/straight_lines2.jpg')
+    # ori_img = mpimg.imread('test_images/test1.jpg')
 
     # undistort
     undistort_img = undistort(ori_img)
-    out_path = 'output_images/undistort_lane'
-    ensure_dir(out_path)
-    cv2.imwrite(os.path.join(out_path, 'test1.jpg'), undistort_img)
-
-    plt.subplot(1,3,1)
-    plt.imshow(undistort_img)
+    #bgr_img = cv2.cvtColor(undistort_img, cv2.COLOR_RGB2BGR)
+    plt.imsave('output_images/test_undistort.jpg', undistort_img)
 
     # compute gradient
-    sbinary, abs_sobel, scale_sobel = gradient_thresh(undistort_img,orient='x',thresh=(20, 100))
+    sbinary, abs_sobel, scale_sobel = gradient_thresh(undistort_img,orient='x',thresh=(10, 100))
     print(np.max(abs_sobel))
-
-    plt.subplot(1,3,2)
-    plt.imshow(sbinary,cmap='gray')
-
 
     # color transform
     hls_binary, s_img = hls_thresh(undistort_img, channel='s',thresh=(90,255))
     print(s_img.shape)
     print(hls_binary.shape)
 
-    plt.subplot(1, 3, 3)
-    plt.imshow(hls_binary,cmap='gray')
+    # plot
+    # f, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=(24,9))
+    # f.tight_layout()
+    # ax1.imshow(undistort_img,cmap='gray')
+    # ax1.set_title("undistorted")
+    # ax2.imshow(sbinary,cmap='gray')
+    # ax2.set_title("sobel threshold")
+    # ax3.imshow(hls_binary,cmap='gray')
+    # ax3.set_title("color threshold")
+    # plt.show()
+    #plt.savefig('output_images/test_binary.jpg')??
 
-    plt.show()
-
+    # combine two binary images
     # binary = sbinary & hls_binary
     # plt.imshow(binary,cmap='gray')
     # plt.show()
 
+    # region of interest
+    roi_mask, roi_masked_img, roi_plt = roi(ori_img)
+    f, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=(24,9))
+    f.tight_layout()
+    ax1.imshow(undistort_img,cmap='gray')
+    ax1.set_title("undistorted")
+    ax2.imshow(roi_masked_img,cmap='gray')
+    ax2.set_title("roi image")
+    ax3.imshow(roi_plt)
+    ax3.set_title("roi region")
+    plt.show()
 
+    # binary = roi_mask & hls_binary
+    # plt.imshow(binary,cmap='gray')
+    # plt.show()
