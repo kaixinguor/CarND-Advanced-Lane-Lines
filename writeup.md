@@ -13,8 +13,7 @@
 
 [//]: # (Image References)
 
-[img_corners]: ./output_images/calib/calibration1.jpg "Corner points"
-[img_undistort]: ./output_images/undistort/undistort1.jpg "Undistort image"
+[image1]: ./output_images/cam_calib.png "Camera calibration"
 [img_test]: ./test_images/straight_lines2.jpg "Road Transformed"
 [img_undistort_lane]: ./output_images/undistort_straight_lines2.jpg "Undistort"
 [img_binary1]: ./output_images/binary_straight_lines2.jpg "Binary1"
@@ -38,18 +37,16 @@
 ####1. Computed camera matrix and distortion coefficients from given chessboard images. 
 
 
-The code for this step is contained in the file called `./cam_calib.py`). 
+The code is in the file called `./cam_calib.py`; the calibration data is in the files `/output_images/calib_pts.npz` and `/output_images/calib_mtx.npz`  
 
 I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.
 
 For detecting chessboard corners, I first convert each chessboard image into gray scale, then use `cv2.findChessboardCorners()` to detect corner points. The points are plotted in the image by `cv2.drawChessboardCorners()`. The following image shows an example
 of detected corners.
 
-![alt text][img_corners]
-
 I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
 
-![alt text][img_undistort]
+![alt text][image1]
 
 I have found two interesting issues during finding corners: 
 
