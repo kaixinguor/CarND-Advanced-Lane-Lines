@@ -142,7 +142,7 @@ The function `warper()` in lines 23 through 28 compute perspectiv matrix and app
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image (shown as follows).
 
-![alt text][img_2_3]
+![alt text][image_2_5]
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
