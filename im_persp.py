@@ -21,22 +21,24 @@ def get_corr_pts(img):
     return num_pt, src_pts, dst_pts
 
 def warper(img):
-    print(ori_img.shape)
-    num_pt, src_pts, dst_pts = get_corr_pts(ori_img)
+    print(img.shape)
+    num_pt, src_pts, dst_pts = get_corr_pts(img)
     M = cv2.getPerspectiveTransform(src_pts, dst_pts)
-    warped = cv2.warpPerspective(ori_img, M, (ori_img.shape[1],ori_img.shape[0]), flags=cv2.INTER_LINEAR)
-    return warped,num_pt,src_pts,dst_pts
+    warped = cv2.warpPerspective(img, M, (img.shape[1],img.shape[0]), flags=cv2.INTER_LINEAR)
+    return warped
 
 if __name__ == "__main__":
-    #ori_img = mpimg.imread('test_images/straight_lines2.jpg')
-    ori_img = mpimg.imread('test_images/test2.jpg')
+    #image = mpimg.imread('test_images/straight_lines2.jpg')
+    image = mpimg.imread('test_images/test2.jpg')
 
-    warped, num_pt, src_pts, dst_pts = warper(ori_img)
+    num_pt, src_pts, dst_pts = get_corr_pts(image)
     print(src_pts)
     print(dst_pts)
 
+    warped = warper(image)
+
     # fix source points
-    img_copy = ori_img.copy()
+    img_copy = image.copy()
     for i in np.arange(num_pt):
         pt1 = src_pts[0, i]
         pt2 = src_pts[0, i - 3]
@@ -50,7 +52,7 @@ if __name__ == "__main__":
 
     f, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=(24,9))
     f.tight_layout()
-    ax1.imshow(ori_img,cmap='gray')
+    ax1.imshow(image,cmap='gray')
     ax1.set_title("original image", fontsize=40)
     ax2.imshow(img_copy,cmap='gray')
     ax2.set_title("src_pts drawn", fontsize=40)
