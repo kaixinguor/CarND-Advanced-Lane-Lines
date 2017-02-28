@@ -21,7 +21,8 @@
 [image_2_3_1]: ./output_images/test_hls.png "color"
 [image_2_3_2]: ./output_images/test_s_binary.png "color"
 [image_2_4]: ./output_images/test_combine.png "combine"
-[image_2_5]: ./output_images/test_persp.png "combine"
+[image_2_5_1]: ./output_images/test_persp_straight2.png "combine"
+[image_2_5_2]: ./output_images/test_persp_test2.png "combine"
 
 [image6]: ./output_images/binary_combine.png "Binary3"
 [img_2_3]: ./output_images/test_perspective.jpg "Warp Example"
@@ -140,9 +141,13 @@ This resulted in the following source and destination points:
 
 The function `warper()` in lines 23 through 28 compute perspectiv matrix and apply it to the input image.
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image (shown as follows).
+I use an image with straight lines to tune the hardcoded corresponidng points in order to get a good perspective matrix. The transformed image looks like this:
 
-![alt text][image_2_5]
+![alt text][image_2_5_1]
+
+Then I apply the same source points on other images with curved lines. It turns out that the transformed lines are still parallel to each other (one example is  shown below).
+
+![alt text][image_2_5_2]
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 

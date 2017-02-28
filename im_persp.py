@@ -28,7 +28,9 @@ def warper(img):
     return warped,num_pt,src_pts,dst_pts
 
 if __name__ == "__main__":
-    ori_img = mpimg.imread('test_images/straight_lines2.jpg')
+    #ori_img = mpimg.imread('test_images/straight_lines2.jpg')
+    ori_img = mpimg.imread('test_images/test2.jpg')
+
     warped, num_pt, src_pts, dst_pts = warper(ori_img)
     print(src_pts)
     print(dst_pts)
