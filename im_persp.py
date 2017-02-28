@@ -46,17 +46,13 @@ if __name__ == "__main__":
         pt2 = dst_pts[0, i - 3]
         cv2.line(img_copy2, (pt1[0], pt1[1]), (pt2[0], pt2[1]), [0, 0, 255], 5)
 
-
-
     f, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=(24,9))
     f.tight_layout()
     ax1.imshow(ori_img,cmap='gray')
-    ax1.set_title("original image")
+    ax1.set_title("original image", fontsize=40)
     ax2.imshow(img_copy,cmap='gray')
-    ax2.set_title("src_pts drawn")
+    ax2.set_title("src_pts drawn", fontsize=40)
     ax3.imshow(img_copy2)
-    ax3.set_title("warped image with dst_pts drawn")
+    ax3.set_title("warped image with dst_pts", fontsize=40)
+    plt.savefig('output_images/test_persp.png')
     plt.show()
-
-
-

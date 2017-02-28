@@ -13,12 +13,17 @@
 
 [//]: # (Image References)
 
-[image1]: ./output_images/cam_calib.png "Camera calibration"
-[img_test]: ./test_images/straight_lines2.jpg "Road Transformed"
-[img_undistort_lane]: ./output_images/undistort_straight_lines2.jpg "Undistort"
-[img_binary1]: ./output_images/binary_straight_lines2.jpg "Binary1"
-[img_binary2]: ./output_images/binary_test1.jpg "Binary2"
-[img_binary3]: ./output_images/binary_combine.jpg "Binary3"
+[image_1_0]: ./output_images/cam_calib.png "Camera calibration"
+[image_2_0]: ./test_images/test1.jpg "Road Transformed"
+[image_2_1]: ./output_images/test_undistort.png "Undistort"
+[image_2_2_1]: ./output_images/test_sobel.png "gradient"
+[image_2_2_2]: ./output_images/test_sobel_binary.png "gradient"
+[image_2_3_1]: ./output_images/test_hls.png "color"
+[image_2_3_2]: ./output_images/test_s_binary.png "color"
+[image_2_4]: ./output_images/test_combine.png "combine"
+[image_2_5]: ./output_images/test_persp.png "combine"
+
+[image6]: ./output_images/binary_combine.png "Binary3"
 [img_2_3]: ./output_images/test_perspective.jpg "Warp Example"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
@@ -46,7 +51,7 @@ of detected corners.
 
 I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
 
-![alt text][image1]
+![alt text][image_1_0]
 
 I have found two interesting issues during finding corners: 
 
@@ -62,35 +67,55 @@ An example is the above image, it gets 9X6 corners, however, opencv will simply 
 ###Pipeline (single images)
 
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][img_test]
+![alt text][image_2_0]
+
 ####1. Provide an example of a distortion-corrected image.
 
-After the camera calibration, I get camera matrix `mtx`, and distortion coeeficients `dist`, applying opencv function `cv2.undistort()` to new images taken by the same camera could get undistorted image. The result is 
+The code of this part in the file `im_trans.py`, function `undistort` in lines 9 through 16. This function load camera matrix `mtx` and distortion coeeficients `dist` saved from calibration step and apply opencv function `cv2.undistort()` to a new image (taken by the same camera). The following picture shows a comparison before and after undistoring the image. 
 
-![alt text][img_undistort_lane]
+![alt text][image_2_1]
 
 
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-The code of this part in the file `image_trans.py`, including image distortion from calibration matrix, image transformation to gray color or to different color space and generating binary images.
+The code of this part in the file `im_trans.py`. I tried different methods to get a binary image: including gradient, color, and region of interest. Some of them look better than others. I will analyze in the following in details. 
 
-To use the gradient threshold, I first convert the image into gray scale and apply `cv2.Sobel()` on the x-direction since x-direction is better than y-direction to pick the lanes. Then threshold `[20,100]` is used to produce a binary image thresholded by gradient (see the middle figure of the above picture.
+* Gradient information.
 
-I also use color to threshold an image. First I convert the image from RGB color space to HLS color space by `cv2.cvtColor`. And S-channel image is chosen to do a thresholding. The parameter is set to `[90,255]`. Notice that in the lecture, an exlusive - inclusive thresholding is used, i.e. `(90, 255]]` while here I use a double inclusive thresholding. 
+The code is in the function `gradient_thresh()` in file `im_trans.py` in lines 19 through 41. 
 
-![alt text][img_binary1]
+To get the gradient information, I tried Sobel filter. I first convert an input image into gray scale and apply `cv2.Sobel()`. For comparison, I plot the result of this filter using different directions, namely, on the x-direction, y-direction, and xy-direction (magnitude). However, the following image shows that all of them are not ideal to pick up the lanes.
 
-By trying different test images, I found that s-channel image is relatively robust while gradient is not so robust under different conditions. For example, see the following picture.
+![alt text][image_2_2_1]
 
-![alt text][img_binary2]
+For example, in the lecture, it is said the x-direction is better than y-direction to pick up the lanes since the lines are mostly vertical. I use the  threshold `[20,100]` to filter sobel with x-direction. Then in the binary (below), the lanes disappear.
 
-I think a combination of color and region of interest will be able to better select the lanes, so I added the ROI selection code of previous lectures above the color selection, then I get results like this:
+![alt text][image_2_2_2]
 
-![alt text][img_binary3]
+* Color information.
+
+The code is in the function `hls_thresh()` in file `im_trans.py` in lines 44 through 52. 
+
+From the lectures, HLS is shown to be good to pick up the lanes. So I convert the input image from RGB color space to HLS color space by `cv2.cvtColor()`. 
+The three channels will look like this 
+
+![alt text][image_2_3_1]
+
+It is very clear than s-channel will do a better job than others. I use threshold `[90,255]` to produce a binary image on s-channel. Notice that in the lecture, an exlusive - inclusive thresholding is used, i.e. `(90, 255]]` while here I use a double inclusive thresholding. The result will look like this
+
+![alt text][image_2_3_2]
+
+By trying different test images, I found that s-channel image is more robust than the gradient. More comparison could be found in `output_images/binary_test*.jpg`. 
+
+* Combination
+
+I think a combination of color and region of interest will be able to better select the lanes, espetially, region of interest will help to remove the sky and tree part in the upper part of the image. so I added the ROI selection code of previous lectures above the color selection, then I get results like this:
+
+![alt text][image_2_4]
 
 ####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 23 through 28 in the file `./trans_perspective.py`. The `warper()` function takes as inputs an image (`img`), and compute source (`src_pts`) as well as and destination (`dst_pts`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform is in the file `im_persp.py`. The function `get_corr_pts()` in lines 6 through 21 defines corresponding points of source (`src_pts`) and and destination (`dst_pts`) points in a manual way (with help of region of interest on an image containing straight lanes). The source and destination points are hardcoded in the following manner:
 
 ```
     src_pts = np.array([[(imsize[0]/6+10, imsize[1]),
@@ -111,6 +136,9 @@ This resulted in the following source and destination points:
 |580.           460.  |320.    0.     |
 |705.           460.  |960.    0.     |
 |1106.66662598  720.  | 960.  720.    |
+
+
+The function `warper()` in lines 23 through 28 compute perspectiv matrix and apply it to the input image.
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image (shown as follows).
 
