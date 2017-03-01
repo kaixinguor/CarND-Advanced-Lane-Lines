@@ -25,7 +25,8 @@
 [image_2_5_1]: ./output_images/test_persp_straight2.png "straght lane"
 [image_2_5_2]: ./output_images/test_persp_test2.png "curved lane"
 [image_2_6_1]: ./output_images/lane_binary_warped.png "Warped"
-[image_2_6_2]: ./output_images/lane_fit_poly.png "Fit"
+[image_2_6_2]: ./output_images/lane_poly_fit.png "Fit"
+[image_2_6_3]: ./output_images/lane_poly_track.png "Fit"
 
 [img_2_3]: ./output_images/test_perspective.jpg "Warp Example"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
