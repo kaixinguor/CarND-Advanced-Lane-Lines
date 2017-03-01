@@ -28,6 +28,7 @@
 [image_2_6_2]: ./output_images/lane_poly_fit.png "Fit"
 [image_2_6_3]: ./output_images/lane_poly_track.png "Track"
 [image_2_6_4]: ./output_images/lane_curvature.png "Curvature"
+[image_2_7]: ./output_images/lane_final.png "Final"
 
 [img_2_3]: ./output_images/test_perspective.jpg "Warp Example"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
@@ -188,12 +189,13 @@ There is a large discrepancy between the curvature  of left and right lanes. Thi
 ![alt text][image_2_6_4]
 
 
-
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I copied the sample code from the lecture to plot the final result. The idea behind is to project fitted curve from warped image back to original image (undistorted one)
 
-![alt text][image6]
+The code for this step is in the function `fin_plot()` 207 through 233 in my code in `lane_fit.py`.  Here is an example of my result on the test image:
+
+![alt text][image_2_7]
 
 ---
 
