@@ -93,14 +93,15 @@ def roi(img):
 def im_trans(img):
 
     undistort_img = undistort(img)
+    sobel_binary_xy, sobel_scale_xy = gradient_thresh(undistort_img, orient='xy', thresh=(20, 100))
     s_binary, s_img, hls_img = hls_thresh(undistort_img, channel='s', thresh=(90, 255))
     roi_mask, roi_masked_img, roi_plt = roi(img)
-    binary = roi_mask[:,:,0] & s_binary
+    binary = roi_mask[:,:,0] & (s_binary | sobel_binary_xy)
     return binary
 
 if __name__ == '__main__':
     # image = mpimg.imread('test_images/straight_lines2.jpg')#RGB
-    image = mpimg.imread('test_images/test1.jpg')
+    image = mpimg.imread('test_images/test2.jpg')
 
     # undistort
     undistort_img = undistort(image)
@@ -176,15 +177,27 @@ if __name__ == '__main__':
 
     # region of interest
     roi_mask, roi_masked_img, roi_plt = roi(image)
-    binary = roi_mask[:,:,0] & s_binary
+    binary = (s_binary | sobel_binary_xy)
 
     f, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=(24,9))
     f.tight_layout()
-    ax1.imshow(roi_plt)
-    ax1.set_title("Region of Interest",fontsize=40)
-    ax2.imshow(s_binary,cmap='gray')
-    ax2.set_title("s binary",fontsize=40)
-    ax3.imshow(binary,cmap='gray')
-    ax3.set_title("combine",fontsize=40)
+    ax1.imshow(sobel_binary_xy, cmap='gray')
+    ax1.set_title("Sobel binary", fontsize=40)
+    ax2.imshow(s_binary, cmap='gray')
+    ax2.set_title("s binary", fontsize=40)
+    ax3.imshow(binary, cmap='gray')
+    ax3.set_title("combine", fontsize=40)
     plt.savefig('output_images/test_combine.png')
+    plt.show()
+
+    final = binary & roi_mask[:, :, 0]
+    f, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=(24,9))
+    f.tight_layout()
+    ax1.imshow(roi_plt)
+    ax1.set_title("Region of Interest", fontsize=40)
+    ax2.imshow(binary, cmap='gray')
+    ax2.set_title("Combined binary", fontsize=40)
+    ax3.imshow(final, cmap='gray')
+    ax3.set_title("ROI filter", fontsize=40)
+    plt.savefig('output_images/test_final.png')
     plt.show()

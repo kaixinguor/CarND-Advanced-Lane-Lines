@@ -14,15 +14,16 @@
 [//]: # (Image References)
 
 [image_1_0]: ./output_images/cam_calib.png "Camera calibration"
-[image_2_0]: ./test_images/test1.jpg "Road Transformed"
+[image_2_0]: ./test_images/test2.jpg "Road Transformed"
 [image_2_1]: ./output_images/test_undistort.png "Undistort"
 [image_2_2_1]: ./output_images/test_sobel.png "gradient"
 [image_2_2_2]: ./output_images/test_sobel_binary.png "gradient"
 [image_2_3_1]: ./output_images/test_hls.png "color"
 [image_2_3_2]: ./output_images/test_s_binary.png "color"
-[image_2_4]: ./output_images/test_combine.png "combine"
-[image_2_5_1]: ./output_images/test_persp_straight2.png "combine"
-[image_2_5_2]: ./output_images/test_persp_test2.png "combine"
+[image_2_4_1]: ./output_images/test_combine.png "combine"
+[image_2_4_2]: ./output_images/test_final.png ""
+[image_2_5_1]: ./output_images/test_persp_straight2.png ""
+[image_2_5_2]: ./output_images/test_persp_test2.png ""
 
 [image6]: ./output_images/binary_combine.png "Binary3"
 [img_2_3]: ./output_images/test_perspective.jpg "Warp Example"
