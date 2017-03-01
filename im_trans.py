@@ -51,6 +51,7 @@ def hls_thresh(img, channel='s', thresh=(0,255)):
 
     return s_binary, s_img, hls_img
 
+
 def roi(img):
     """
     Defines an image mask.
@@ -90,6 +91,7 @@ def roi(img):
     masked_image = cv2.bitwise_and(img, mask)
     return mask,masked_image,roi_plt
 
+
 def im_trans(img):
 
     undistort_img = undistort(img)
@@ -98,6 +100,7 @@ def im_trans(img):
     roi_mask, roi_masked_img, roi_plt = roi(img)
     binary = roi_mask[:,:,0] & (s_binary | sobel_binary_xy)
     return binary
+
 
 if __name__ == '__main__':
     # image = mpimg.imread('test_images/straight_lines2.jpg')#RGB

@@ -5,7 +5,6 @@ from im_trans import im_trans, undistort
 import numpy as np
 import cv2
 
-
 def poly_fit(binary_warped): # from the lecture
     # Create an output image to draw on and  visualize the result
     out_img = np.dstack((binary_warped, binary_warped, binary_warped)) * 255
@@ -19,7 +18,6 @@ def poly_fit(binary_warped): # from the lecture
     nwindows = 9
     # Set height of windows
     window_height = np.int(binary_warped.shape[0] / nwindows)
-    print(window_height)
     # Identify the x and y positions of all nonzero pixels in the image
     nonzero = binary_warped.nonzero()
     nonzeroy = np.array(nonzero[0])
@@ -27,8 +25,7 @@ def poly_fit(binary_warped): # from the lecture
     # Current positions to be updated for each window
     leftx_current = leftx_base
     rightx_current = rightx_base
-    print(leftx_base)
-    print(rightx_base)
+    print("left base: ", leftx_base, ", right base: ", rightx_base)
     # Set the width of the windows +/- margin
     margin = 100
     # Set minimum number of pixels found to recenter window
@@ -185,7 +182,10 @@ def curvature(left_fit, right_fit, leftx, lefty, rightx, righty):
     y_eval = np.max(ploty)
     left_curverad = ((1 + (2 * left_fit[0] * y_eval + left_fit[1]) ** 2) ** 1.5) / np.absolute(2 * left_fit[0])
     right_curverad = ((1 + (2 * right_fit[0] * y_eval + right_fit[1]) ** 2) ** 1.5) / np.absolute(2 * right_fit[0])
-    print(left_curverad, right_curverad)
+    print("curvature in pixel", left_curverad, right_curverad)
+
+    offset = (left_fitx[-1] + right_fitx[-1])/2-1280/2 # + right - left
+    print("center bias in pixel", offset)
 
     # Define conversions in x and y from pixels space to meters
     ym_per_pix = 30 / 720  # meters per pixel in y dimension
@@ -200,11 +200,16 @@ def curvature(left_fit, right_fit, leftx, lefty, rightx, righty):
     right_curverad = ((1 + (2 * right_fit_cr[0] * y_eval * ym_per_pix + right_fit_cr[1]) ** 2) ** 1.5) / np.absolute(
         2 * right_fit_cr[0])
     # Now our radius of curvature is in meters
-    print(left_curverad, 'm', right_curverad, 'm')
+    print("curvature in meter", left_curverad, 'm', right_curverad, 'm')
     # Example values: 632.1 m    626.2 m
 
+    offset_dist = offset*xm_per_pix
+    print("offset in meter ", offset_dist, 'm')
 
-def fin_plot(undist, warped,left_fit,right_fit):
+    return left_curverad, right_curverad, offset_dist
+
+
+def lane_plot(undist, warped,left_fit,right_fit):
     # Create an image to draw the lines on
     print("size")
     print(warped.shape)
@@ -267,7 +272,5 @@ if __name__ == '__main__':
     # fit poly
     left_fit, right_fit, leftx, lefty, rightx, righty = poly_fit(binary_warped)
     left_fit, right_fit, leftx, lefty, rightx, righty = poly_track(binary_warped,left_fit,right_fit)
-    print(left_fit)
-    print(right_fit)
-    curvature(left_fit, right_fit, leftx, lefty, rightx, righty)
+    left_curverad, right_curverad, offset_dist = curvature(left_fit, right_fit, leftx, lefty, rightx, righty)
     fin_plot(undist, binary_warped,left_fit,right_fit)

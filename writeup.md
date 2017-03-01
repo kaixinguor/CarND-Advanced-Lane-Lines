@@ -148,7 +148,7 @@ This resulted in the following source and destination points:
 |1106.66662598  720.  | 960.  720.    |
 
 
-The function `warper()` in lines 23 through 28 compute perspectiv matrix and apply it to the input image.
+The function `warper()` in lines 28 through 33 in file `im_persp.py` compute perspectiv matrix and apply it to the input image.
 
 I use an image with straight lines to tune the hardcoded corresponidng points in order to get a good perspective matrix. The transformed image looks like this:
 
@@ -174,7 +174,7 @@ Given the lane information from the previous frame, searching in the next frame 
 
 ####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I copied the code from the lecture to compute curvatures. The code is in function `curvature()` in lines 158 through 204 in my code in `lane_fit.py`
+I copied the code from the lecture to compute curvatures. The code is in function `curvature()` in lines 155 through 209 in my code in `lane_fit.py`
 
 Bacically, the curvature could be computed using the coefficients of fitted polynomial function. Based on a mapping between distance of pixels and distance in real world, we could compute the radius of the two lanes are:
 
@@ -188,12 +188,13 @@ There is a large discrepancy between the curvature  of left and right lanes. Thi
 
 ![alt text][image_2_6_4]
 
+The computation of the vehicle position is similar, using position of  left_curverad, right_curverad at the bottom of the image, I compute the difference between their center-x and the image center-x is 28.8 pixels, i.e., 0.17 m in the real world.
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
 I copied the sample code from the lecture to plot the final result. The idea behind is to project fitted curve from warped image back to original image (undistorted one)
 
-The code for this step is in the function `fin_plot()` 207 through 233 in my code in `lane_fit.py`.  Here is an example of my result on the test image:
+The code for this step is in the function `lane_plot()` 212 through 238 in my code in `lane_fit.py`.  Here is an example of my result on the test image:
 
 ![alt text][image_2_7]
 
