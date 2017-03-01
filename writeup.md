@@ -26,7 +26,8 @@
 [image_2_5_2]: ./output_images/test_persp_test2.png "curved lane"
 [image_2_6_1]: ./output_images/lane_binary_warped.png "Warped"
 [image_2_6_2]: ./output_images/lane_poly_fit.png "Fit"
-[image_2_6_3]: ./output_images/lane_poly_track.png "Fit"
+[image_2_6_3]: ./output_images/lane_poly_track.png "Track"
+[image_2_6_4]: ./output_images/lane_curvature.png "Curvature"
 
 [img_2_3]: ./output_images/test_perspective.jpg "Warp Example"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
@@ -166,9 +167,27 @@ I copied sample code from lecture to do a window searching for the lane pixels. 
 
 ![alt text][image_2_6_2]
 
+Given the lane information from the previous frame, searching in the next frame can leverage this information, so tracking the lane would be easier and faster. The basic idea is to replace the searching windows by strips around fitted polynomial curve, then recompute the coefficients using the lane pixels.
+
+![alt text][image_2_6_3]
+
 ####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I copied the code from the lecture to compute curvatures. The code is in lines 97 through 150 in my code in ``lane_fit.py``
+I copied the code from the lecture to compute curvatures. The code is in function `curvature()` in lines 158 through 204 in my code in `lane_fit.py`
+
+Bacically, the curvature could be computed using the coefficients of fitted polynomial function. Based on a mapping between distance of pixels and distance in real world, we could compute the radius of the two lanes are:
+
+
+| Left         | Right         | 
+|:------------:|:-------------:| 
+|2332.3 pixels | 1321.9 pixels |
+|678.6m        | 367.6m        | 
+
+There is a large discrepancy between the curvature  of left and right lanes. This could be observed from the following plotting: The right lane containes some  extra pixels in the beginning and this caused a bias of the polynomial estimation. Some improvment could be done for this.
+
+![alt text][image_2_6_4]
+
+
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
