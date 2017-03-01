@@ -286,6 +286,12 @@ if __name__ == '__main__':
     left_fit, right_fit, leftx, lefty, rightx, righty = poly_track(binary_warped,left_fit,right_fit)
     left_curverad, right_curverad, offset_dist = curvature(left_fit, right_fit, leftx, lefty, rightx, righty)
     result = lane_plot(undist, binary_warped,left_fit,right_fit)
-    plt.imshow(result)
+
+    f, ax = plt.subplots()
+    f.tight_layout()
+    ax.imshow(result)
+    ax.text(50,30,"Radius of Curvature = {:4.0f} m".format(left_curverad),ha='left',va='top',color='white',fontsize=20)
+    ax.text(50,100, "Vehicle is {:.02f} m right of center".format(offset_dist), ha='left', va='top', color='white',
+            fontsize=20)
     plt.savefig('output_images/lane_final.png')
     plt.show()
