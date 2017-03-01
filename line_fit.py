@@ -14,13 +14,12 @@ def poly_fit(binary_warped): # from the lecture
     midpoint = np.int(histogram.shape[0] / 2)
     leftx_base = np.argmax(histogram[:midpoint])
     rightx_base = np.argmax(histogram[midpoint:]) + midpoint
-    print(leftx_base)
-    print(rightx_base)
 
     # Choose the number of sliding windows
     nwindows = 9
     # Set height of windows
     window_height = np.int(binary_warped.shape[0] / nwindows)
+    print(window_height)
     # Identify the x and y positions of all nonzero pixels in the image
     nonzero = binary_warped.nonzero()
     nonzeroy = np.array(nonzero[0])
@@ -83,14 +82,16 @@ def poly_fit(binary_warped): # from the lecture
 
     out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
     out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
+
     plt.imshow(out_img)
     plt.plot(left_fitx, ploty, color='yellow')
     plt.plot(right_fitx, ploty, color='yellow')
     plt.xlim(0, 1280)
     plt.ylim(720, 0)
+    plt.savefig('output_images/lane_fit_poly')
     plt.show()
 
-    return left_fitx, right_fitx
+    return left_fit, right_fit #, out_img, left_fitx, right_fitx, ploty
 
 
 def fin_plot():
@@ -185,7 +186,7 @@ if __name__ == '__main__':
     ax2.set_title("Binary image", fontsize=40)
     ax3.imshow(binary_warped,cmap='gray')
     ax3.set_title("Warped image", fontsize=40)
-    plt.savefig('output_images/lane_fit1.png')
+    plt.savefig('output_images/lane_binary_warped.png')
     plt.show()
 
     histogram = np.sum(binary_warped,axis=0)
@@ -197,9 +198,11 @@ if __name__ == '__main__':
     ax1.set_title("Warped image", fontsize=40)
     ax2.plot(histogram)
     ax2.set_title("Histogram", fontsize=40)
-    plt.savefig('output_images/lane_fit2.png')
+    plt.savefig('output_images/lane_histogram.png')
     plt.show()
 
-    poly_fit(binary_warped)
+    # fit poly
+    left_fit, right_fit = poly_fit(binary_warped)
+
     curvature()
     fin_plot()

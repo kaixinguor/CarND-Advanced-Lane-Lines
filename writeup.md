@@ -21,11 +21,12 @@
 [image_2_3_1]: ./output_images/test_hls.png "color"
 [image_2_3_2]: ./output_images/test_s_binary.png "color"
 [image_2_4_1]: ./output_images/test_combine.png "combine"
-[image_2_4_2]: ./output_images/test_final.png ""
-[image_2_5_1]: ./output_images/test_persp_straight2.png ""
-[image_2_5_2]: ./output_images/test_persp_test2.png ""
+[image_2_4_2]: ./output_images/test_final.png "final"
+[image_2_5_1]: ./output_images/test_persp_straight2.png "straght lane"
+[image_2_5_2]: ./output_images/test_persp_test2.png "curved lane"
+[image_2_6_1]: ./output_images/lane_binary_warped.png "Warped"
+[image_2_6_2]: ./output_images/lane_fit_poly.png "Fit"
 
-[image6]: ./output_images/binary_combine.png "Binary3"
 [img_2_3]: ./output_images/test_perspective.jpg "Warp Example"
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
@@ -107,13 +108,17 @@ It is very clear than s-channel will do a better job than others. I use threshol
 
 ![alt text][image_2_3_2]
 
-By trying different test images, I found that s-channel image is more robust than the gradient. More comparison could be found in `output_images/binary_test*.jpg`. 
+The above results show that s-channel need to be complemented by gradient channel to select both sides of lanes. More comparison could be found in `output_images/binary_test*.jpg`. 
 
 * Combination
 
-I think a combination of color and region of interest will be able to better select the lanes, espetially, region of interest will help to remove the sky and tree part in the upper part of the image. so I added the ROI selection code of previous lectures above the color selection, then I get results like this:
+By comining color and gradient channel, the result will show both sides of lanes.
 
-![alt text][image_2_4]
+![alt text][image_2_4_1]
+
+Using region of interest could remove the extra pixels like sky and trees etc. in the upper part of the image. so I added the ROI selection code of previous lectures above the binary image, then I get results like this:
+
+![alt text][image_2_4_2]
 
 ####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
@@ -152,9 +157,13 @@ Then I apply the same source points on other images with curved lines. It turns 
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+Applied all techniques introduced in the last section, the binary warped lane image looks like this:
 
-![alt text][image5]
+![alt text][image_2_6_1]
+
+I copied sample code from lecture to do a window searching for the lane pixels.  The search starts from bottom of the image, with the position getting the peak value of histogram for columes. Then the search place rectangles centered at the base position, and count number of pixels. When the number of pixels attains 50, the next box will placed at the center of all these pixels. And so on so forth. When all the pixels are recognized as lane pixels, they are used to fit a 2nd-order polynomial function. The result is the following: green boxes are the searched box, all pixels inside are considered as lane pixels (red for the left lane, and blue for the right lane); the yellow curves are fitted polynomial curves.
+
+![alt text][image_2_6_2]
 
 ####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
