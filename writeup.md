@@ -167,7 +167,7 @@ I copied sample code from lecture to do a window searching for the lane pixels. 
 
 ####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+I copied the code from the lecture to compute curvatures. The code is in lines 97 through 150 in my code in ``lane_fit.py``
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
