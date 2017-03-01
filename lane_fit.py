@@ -7,9 +7,12 @@ import cv2
 
 def poly_fit(binary_warped): # from the lecture
     # Create an output image to draw on and  visualize the result
-    out_img = np.dstack((binary_warped, binary_warped, binary_warped)) * 255
+    # out_img = np.dstack((binary_warped, binary_warped, binary_warped)) * 255
+
     # Find the peak of the left and right halves of the histogram
     # These will be the starting point for the left and right lines
+
+    histogram = np.sum(binary_warped, axis=0)
     midpoint = np.int(histogram.shape[0] / 2)
     leftx_base = np.argmax(histogram[:midpoint])
     rightx_base = np.argmax(histogram[midpoint:]) + midpoint
@@ -44,8 +47,8 @@ def poly_fit(binary_warped): # from the lecture
         win_xright_low = rightx_current - margin
         win_xright_high = rightx_current + margin
         # Draw the windows on the visualization image
-        cv2.rectangle(out_img, (win_xleft_low, win_y_low), (win_xleft_high, win_y_high), (0, 255, 0), 2)
-        cv2.rectangle(out_img, (win_xright_low, win_y_low), (win_xright_high, win_y_high), (0, 255, 0), 2)
+        # cv2.rectangle(out_img, (win_xleft_low, win_y_low), (win_xleft_high, win_y_high), (0, 255, 0), 2)
+        # cv2.rectangle(out_img, (win_xright_low, win_y_low), (win_xright_high, win_y_high), (0, 255, 0), 2)
         # Identify the nonzero pixels in x and y within the window
         good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) & (nonzerox >= win_xleft_low) & (
             nonzerox < win_xleft_high)).nonzero()[0]
@@ -79,16 +82,16 @@ def poly_fit(binary_warped): # from the lecture
     left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
     right_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
 
-    out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
-    out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
-
-    plt.imshow(out_img)
-    plt.plot(left_fitx, ploty, color='yellow')
-    plt.plot(right_fitx, ploty, color='yellow')
-    plt.xlim(0, 1280)
-    plt.ylim(720, 0)
-    plt.savefig('output_images/lane_poly_fit')
-    plt.show()
+    # out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
+    # out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
+    #
+    # plt.imshow(out_img)
+    # plt.plot(left_fitx, ploty, color='yellow')
+    # plt.plot(right_fitx, ploty, color='yellow')
+    # plt.xlim(0, 1280)
+    # plt.ylim(720, 0)
+    # plt.savefig('output_images/lane_poly_fit')
+    # plt.show()
 
     return left_fit, right_fit, leftx, lefty, rightx, righty
 
@@ -122,11 +125,11 @@ def poly_track(binary_warped,left_fit,right_fit):
 
 
     # Create an image to draw on and an image to show the selection window
-    out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
-    window_img = np.zeros_like(out_img)
-    # Color in left and right line pixels
-    out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
-    out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
+    # out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
+    # window_img = np.zeros_like(out_img)
+    # # Color in left and right line pixels
+    # out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
+    # out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
 
     # Generate a polygon to illustrate the search window area
     # And recast the x and y points into usable format for cv2.fillPoly()
@@ -138,16 +141,16 @@ def poly_track(binary_warped,left_fit,right_fit):
     right_line_pts = np.hstack((right_line_window1, right_line_window2))
 
     # Draw the lane onto the warped blank image
-    cv2.fillPoly(window_img, np.int_([left_line_pts]), (0,255, 0))
-    cv2.fillPoly(window_img, np.int_([right_line_pts]), (0,255, 0))
-    result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
-    plt.imshow(result)
-    plt.plot(left_fitx, ploty, color='yellow')
-    plt.plot(right_fitx, ploty, color='yellow')
-    plt.xlim(0, 1280)
-    plt.ylim(720, 0)
-    plt.savefig('output_images/lane_poly_track.png')
-    plt.show()
+    # cv2.fillPoly(window_img, np.int_([left_line_pts]), (0,255, 0))
+    # cv2.fillPoly(window_img, np.int_([right_line_pts]), (0,255, 0))
+    # result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
+    # plt.imshow(result)
+    # plt.plot(left_fitx, ploty, color='yellow')
+    # plt.plot(right_fitx, ploty, color='yellow')
+    # plt.xlim(0, 1280)
+    # plt.ylim(720, 0)
+    # plt.savefig('output_images/lane_poly_track.png')
+    # plt.show()
 
     return left_fit, right_fit, leftx, lefty, rightx, righty
 
@@ -167,15 +170,15 @@ def curvature(left_fit, right_fit, leftx, lefty, rightx, righty):
 
     # Plot up the fake data
     mark_size = 3
-    plt.plot(leftx, lefty, 'o', color='red', markersize=mark_size)
-    plt.plot(rightx, righty, 'o', color='blue', markersize=mark_size)
-    plt.xlim(0, 1280)
-    plt.ylim(0, 720)
-    plt.plot(left_fitx, ploty, color='green', linewidth=3)
-    plt.plot(right_fitx, ploty, color='green', linewidth=3)
-    plt.gca().invert_yaxis()  # to visualize as we do the images
-    plt.savefig('output_images/lane_curvature.png')
-    plt.show()
+    # plt.plot(leftx, lefty, 'o', color='red', markersize=mark_size)
+    # plt.plot(rightx, righty, 'o', color='blue', markersize=mark_size)
+    # plt.xlim(0, 1280)
+    # plt.ylim(0, 720)
+    # plt.plot(left_fitx, ploty, color='green', linewidth=3)
+    # plt.plot(right_fitx, ploty, color='green', linewidth=3)
+    # plt.gca().invert_yaxis()  # to visualize as we do the images
+    # plt.savefig('output_images/lane_curvature.png')
+    # plt.show()
 
     # Define y-value where we want radius of curvature
     # I'll choose the maximum y-value, corresponding to the bottom of the image
@@ -209,14 +212,14 @@ def curvature(left_fit, right_fit, leftx, lefty, rightx, righty):
     return left_curverad, right_curverad, offset_dist
 
 
-def lane_plot(undist, warped,left_fit,right_fit):
+def lane_plot(undist, warped, left_fit,right_fit):
     # Create an image to draw the lines on
     print("size")
     print(warped.shape)
     warp_zero = np.zeros_like(warped).astype(np.uint8)
     color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
 
-    ploty = np.linspace(0, binary_warped.shape[0] - 1, binary_warped.shape[0])
+    ploty = np.linspace(0, warped.shape[0] - 1, warped.shape[0])
     left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
     right_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
 
@@ -230,13 +233,22 @@ def lane_plot(undist, warped,left_fit,right_fit):
 
     Minv = warper_Minv(warped)
     # Warp the blank back to original image space using inverse perspective matrix (Minv)
-    newwarp = cv2.warpPerspective(color_warp, Minv, (image.shape[1], image.shape[0]))
+    newwarp = cv2.warpPerspective(color_warp, Minv, (warped.shape[1], warped.shape[0]))
     # Combine the result with the original image
     result = cv2.addWeighted(undist, 1, newwarp, 0.3, 0)
-    plt.imshow(result)
-    plt.savefig('output_images/lane_final.png')
-    plt.show()
 
+    return result
+
+def lane_fit(img):
+    undist = undistort(img)
+    binary = im_trans(img)
+    # warped = warper(img)
+    binary_warped = warper(binary)
+    left_fit, right_fit, leftx, lefty, rightx, righty = poly_fit(binary_warped)
+    left_fit, right_fit, leftx, lefty, rightx, righty = poly_track(binary_warped, left_fit, right_fit)
+    left_curverad, right_curverad, offset_dist = curvature(left_fit, right_fit, leftx, lefty, rightx, righty)
+    result = lane_plot(undist, binary_warped, left_fit, right_fit)
+    return result
 
 if __name__ == '__main__':
     # ori_img = mpimg.imread('test_images/straight_lines2.jpg')
@@ -246,31 +258,34 @@ if __name__ == '__main__':
     warped = warper(image)
     binary_warped = warper(binary)
 
-    f, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=(24,9))
-    f.tight_layout()
-    ax1.imshow(image,cmap='gray')
-    ax1.set_title("Original image", fontsize=40)
-    ax2.imshow(binary,cmap='gray')
-    ax2.set_title("Binary image", fontsize=40)
-    ax3.imshow(binary_warped,cmap='gray')
-    ax3.set_title("Warped image", fontsize=40)
-    plt.savefig('output_images/lane_binary_warped.png')
-    plt.show()
+    # f, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=(24,9))
+    # f.tight_layout()
+    # ax1.imshow(image,cmap='gray')
+    # ax1.set_title("Original image", fontsize=40)
+    # ax2.imshow(binary,cmap='gray')
+    # ax2.set_title("Binary image", fontsize=40)
+    # ax3.imshow(binary_warped,cmap='gray')
+    # ax3.set_title("Warped image", fontsize=40)
+    # plt.savefig('output_images/lane_binary_warped.png')
+    # plt.show()
 
     histogram = np.sum(binary_warped,axis=0)
     #histogram = np.sum(binary_warped[binary_warped.shape[0] / 2:, :], axis=0)
 
-    f, (ax1,ax2) = plt.subplots(1,2,figsize=(24,9))
-    f.tight_layout()
-    ax1.imshow(binary_warped,cmap='gray')
-    ax1.set_title("Warped image", fontsize=40)
-    ax2.plot(histogram)
-    ax2.set_title("Histogram", fontsize=40)
-    plt.savefig('output_images/lane_histogram.png')
-    plt.show()
+    # f, (ax1,ax2) = plt.subplots(1,2,figsize=(24,9))
+    # f.tight_layout()
+    # ax1.imshow(binary_warped,cmap='gray')
+    # ax1.set_title("Warped image", fontsize=40)
+    # ax2.plot(histogram)
+    # ax2.set_title("Histogram", fontsize=40)
+    # plt.savefig('output_images/lane_histogram.png')
+    # plt.show()
 
     # fit poly
     left_fit, right_fit, leftx, lefty, rightx, righty = poly_fit(binary_warped)
     left_fit, right_fit, leftx, lefty, rightx, righty = poly_track(binary_warped,left_fit,right_fit)
     left_curverad, right_curverad, offset_dist = curvature(left_fit, right_fit, leftx, lefty, rightx, righty)
-    fin_plot(undist, binary_warped,left_fit,right_fit)
+    result = lane_plot(undist, binary_warped,left_fit,right_fit)
+    plt.imshow(result)
+    plt.savefig('output_images/lane_final.png')
+    plt.show()

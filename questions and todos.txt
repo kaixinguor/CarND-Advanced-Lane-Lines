@@ -1,0 +1,6 @@
+why s channel use (, ] to thresh
+
+project back to undist image or original image
+
+
+How to measure robustness of the cv method to find lanes?

@@ -26,7 +26,7 @@ def warper_Minv(img):
     return Minv
 
 def warper(img):
-    print("warped image shape: ", img.shape)
+    #print("warped image shape: ", img.shape)
     num_pt, src_pts, dst_pts = get_corr_pts(img)
     M = cv2.getPerspectiveTransform(src_pts, dst_pts)
     warped = cv2.warpPerspective(img, M, (img.shape[1],img.shape[0]), flags=cv2.INTER_LINEAR)
