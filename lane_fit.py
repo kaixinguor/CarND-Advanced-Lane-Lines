@@ -248,7 +248,36 @@ def lane_fit(img):
     left_fit, right_fit, leftx, lefty, rightx, righty = poly_track(binary_warped, left_fit, right_fit)
     left_curverad, right_curverad, offset_dist = curvature(left_fit, right_fit, leftx, lefty, rightx, righty)
     result = lane_plot(undist, binary_warped, left_fit, right_fit)
-    return result
+    return result, left_curverad, right_curverad, offset_dist
+
+
+def SaveFigureAsImage(fileName, fig=None, **kwargs):
+    ''' Save a Matplotlib figure as an image without borders or frames.
+       Args:
+            fileName (str): String that ends in .png etc.
+
+            fig (Matplotlib figure instance): figure you want to save as the image
+        Keyword Args:
+            orig_size (tuple): width, height of the original image used to maintain
+            aspect ratio.
+    '''
+    fig_size = fig.get_size_inches()
+    w, h = fig_size[0], fig_size[1]
+    fig.patch.set_alpha(0)
+    # if kwargs.has_key('orig_size'):  # Aspect ratio scaling if required
+    #     w, h = kwargs['orig_size']
+    #     w2, h2 = fig_size[0], fig_size[1]
+    #     fig.set_size_inches([(w2 / w) * w, (w2 / w) * h])
+    #     fig.set_dpi((w2 / w) * fig.get_dpi())
+    a = fig.gca()
+    a.set_frame_on(False)
+    a.set_xticks([]);
+    a.set_yticks([])
+    plt.axis('off')
+    plt.xlim(0, h);
+    plt.ylim(w, 0)
+    fig.savefig(fileName, transparent=True, bbox_inches='tight', \
+                pad_inches=0)
 
 if __name__ == '__main__':
     # ori_img = mpimg.imread('test_images/straight_lines2.jpg')
@@ -287,11 +316,16 @@ if __name__ == '__main__':
     left_curverad, right_curverad, offset_dist = curvature(left_fit, right_fit, leftx, lefty, rightx, righty)
     result = lane_plot(undist, binary_warped,left_fit,right_fit)
 
+    sizes = np.shape(result)
+    height = float(sizes[0])
+    width = float(sizes[1])
+
     f, ax = plt.subplots()
     f.tight_layout()
     ax.imshow(result)
     ax.text(50,30,"Radius of Curvature = {:4.0f} m".format(left_curverad),ha='left',va='top',color='white',fontsize=20)
-    ax.text(50,100, "Vehicle is {:.02f} m right of center".format(offset_dist), ha='left', va='top', color='white',
-            fontsize=20)
+    ax.text(50,100, "Vehicle is {:.02f} m right of center".format(offset_dist), ha='left', va='top', color='white', fontsize=20)
     plt.savefig('output_images/lane_final.png')
+    #SaveFigureAsImage('output_images/lane_final.png', plt.gcf())
+
     plt.show()
