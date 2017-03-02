@@ -5,17 +5,18 @@ from myutil import ensure_dir
 
 
 if __name__ == '__main__':
-    output_dir = 'output_images/project_video_result'
+    target = "harder_challenge"
+    output_dir = "output_images/" + target + "_video_result"
     ensure_dir(output_dir)
 
-    vidcap = cv2.VideoCapture('project_video.mp4')
+    vidcap = cv2.VideoCapture(target + "_video.mp4")
     length = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
     width  = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = vidcap.get(cv2.CAP_PROP_FPS)
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output_images/project_video_result.avi', fourcc, fps, (width, height))
+    out = cv2.VideoWriter("output_images/" + target + "_video_result.avi", fourcc, fps, (width, height))
 
     count = 0
     while True:
@@ -38,7 +39,7 @@ if __name__ == '__main__':
         # ax.text(50, 100, "Vehicle is {:.02f} m right of center".format(offset_dist), ha='left', va='top', color='white',
         #         fontsize=20)
 
-        cv2.imwrite('output_images/project_video_result/{:04d}.jpg'.format(count),result)
+        cv2.imwrite("output_images/" + target + "_video_result/{:04d}.jpg".format(count),result)
         out.write(result)
         count += 1
 

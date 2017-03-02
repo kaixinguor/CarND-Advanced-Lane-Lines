@@ -95,10 +95,10 @@ def roi(img):
 def im_trans(img):
 
     undistort_img = undistort(img)
-    sobel_binary_xy, sobel_scale_xy = gradient_thresh(undistort_img, orient='xy', thresh=(20, 100))
+    sobel_binary_x, sobel_scale_x = gradient_thresh(undistort_img, orient='x', thresh=(20, 100))
     s_binary, s_img, hls_img = hls_thresh(undistort_img, channel='s', thresh=(90, 255))
     roi_mask, roi_masked_img, roi_plt = roi(img)
-    binary = roi_mask[:,:,0] & (s_binary | sobel_binary_xy)
+    binary = roi_mask[:,:,0] & (s_binary | sobel_binary_x)
     return binary
 
 
@@ -180,11 +180,11 @@ if __name__ == '__main__':
 
     # region of interest
     roi_mask, roi_masked_img, roi_plt = roi(image)
-    binary = (s_binary | sobel_binary_xy)
+    binary = (s_binary | sobel_binary_x)
 
     f, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=(24,9))
     f.tight_layout()
-    ax1.imshow(sobel_binary_xy, cmap='gray')
+    ax1.imshow(sobel_binary_x, cmap='gray')
     ax1.set_title("Sobel binary", fontsize=40)
     ax2.imshow(s_binary, cmap='gray')
     ax2.set_title("s binary", fontsize=40)
